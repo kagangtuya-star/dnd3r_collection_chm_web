@@ -1,0 +1,443 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
+<!-- saved from url=(0014)about:internet -->
+<html>
+<head>
+<title>【DND】3R核心byChrisanother</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style type="text/css"> 
+<!-- 
+.selected {font-weight: normal;background-color: #E2E2E2;padding:0px,2px,0px,2px;}
+.unselected { font-weight: normal;padding:0px,2px,0px,2px;}
+.hand { cursor: hand; }
+.p {height: 16px;width: 16px;vertical-align: middle;border: 0;}
+div,body { font-family: Tahoma, Verdana; font-size: 11px; }
+A:link {text-decoration: none; color:#000000}
+A:visited {text-decoration: none; color: #000000}
+A:active {text-decoration: none; color: #000000 }
+A:hover {text-decoration: none; color: #FF0000 }
+
+-->
+</style>
+
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+var cl,pn,pm,bl;
+var path = 'icons/';
+var pos = 0;
+var icon;
+var tar = 'content';
+var display;
+var imgi;
+var AutoCollapse;
+var LastSelected = -1;
+var loaded = false;
+var max;
+var divlist;
+
+function SetEnv(v,a){
+
+if(v==0){ 
+	pn = [['daplus.gif','daminus.gif'],['tplus.gif','tminus.gif'],['uaplus.gif','uaminus.gif'],['splus.gif','sminus.gif']];
+	PreloadImg('downangle.gif','tshaped.gif','upangle.gif','sline.gif','daplus.gif','daminus.gif','tplus.gif','tminus.gif','uaplus.gif','uaminus.gif','splus.gif','sminus.gif','blank.gif','line.gif');
+}else{
+	pn = [['plus.gif','minus.gif']];
+	PreloadImg('plus.gif','minus.gif','blank.gif');
+
+}
+AutoCollapse = a;
+}
+
+ function PreloadImg(){
+if (document.images) { 
+	var imgs = PreloadImg.arguments; 
+	var pload = new Array();
+	for (var i=0; i<imgs.length; i++) { 
+		pload[i] = new Image; 
+		pload[i].src = path + imgs[i]; 
+	} 
+} 
+ } 
+
+function get(o){
+var x;
+if(document.all) x=document.all[o]; 
+if(document.getElementById) x=document.getElementById(o);
+
+return x;
+}
+
+
+function pnImg(img){
+var i,j;
+for(i=0;i<=3;i++){
+	for(j=0;j<=1;j++){
+	if(img.substr(img.lastIndexOf('/') + 1)== pn[i][j]){
+		return i;
+	}
+	}
+}
+}
+function icon(img){
+var f;
+f = img.substr(img.lastIndexOf('/') + 1);
+if( f=='1.gif' || f=='2.gif'){
+	return ['1.gif','2.gif'];
+}
+if( f=='3.gif' || f=='4.gif'){
+	return ['3.gif','4.gif'];
+}
+if( f=='5.gif' || f=='6.gif'){
+	return ['5.gif','6.gif'];
+}
+if( f=='7.gif' || f=='8.gif'){
+	return ['7.gif','8.gif'];
+}
+return [f,f];
+}
+
+function show(id){
+get('d' + id).style.display='block';
+if(get('imgn' + id )) get('imgn' + id ).src= path + pn[pnImg(get('imgn' + id ).src)][1];
+get('img' + id ).src= path + icon(get('img' + id ).src)[1];
+
+}
+
+function collapse(id){
+get('d' + id ).style.display='none';
+if(get('imgn' + id )) get('imgn' + id ).src= path + pn[pnImg(get('imgn' + id ).src)][0];
+get('img' + id ).src= path + icon(get('img' + id ).src)[0];
+
+}
+
+function collapseAll(){
+var i;
+var o;
+for(i=0;i<=divlist.length-1;i++){
+	if(o=get('d' + divlist[i])){
+		if(o.style.display!='none'){ 
+			collapse(divlist[i]);
+		}
+	}
+}
+}
+
+function showAll(){
+var i;
+var o;
+for(i=0;i<=divlist.length-1;i++){
+	if(o=get('d' + divlist[i])){
+		if(o.style.display!='block'){ 
+			show(divlist[i]);
+		}
+	}
+}
+}
+
+function unselectAll(){
+var i=0;
+while(get("l" + i)){
+	get("l" + i).className = "unselected";
+	i++;
+}
+}
+
+function clickNode(index){
+var e;
+
+e = get("l" + index);
+if(e==null) return;
+e = e.parentNode;
+if(e.nodeName == 'A'){
+	if(e.href!= window.location.href + '#'){
+		parent.parent.content.location.href = e.href;
+	}else{
+		selectNode(index);
+	}
+	e.onclick;
+}
+}
+
+function showParent(ele){
+var e;
+e = ele.parentNode;
+
+if(e==null) return;
+
+if(e.nodeName == 'DIV'){
+	if(e.id!='') show(e.id.substring(1,e.id.length ));
+}else if(e.nodeName == 'A'){
+
+}
+showParent(e);
+}
+
+function showNode(index){
+showParent(get("l" + index));
+LinkClick(index);
+}
+
+function selectNode(index){
+if(LastSelected!=index){
+//collapseAll();
+showParent(get("l" + index));
+LinkClick(index);
+get('l' + index).scrollIntoView(true);
+
+
+//alert(get('l' + index).offsetHeight + '|' + document.body.clientHeight + '|' + document.body.offsetHeight);
+window.scrollTo(0,document.body.scrollTop); // - document.body.clientHeight /3);
+}
+}
+
+
+function NodeClick(id){
+if(get('d' + id ).style.display=='none'){
+	show(id);
+}else{
+	collapse(id);
+}
+return false;
+}
+
+function LinkDblClick(id){
+if(!AutoCollapse){
+	if(get('d' + id ).style.display=='none'){
+		show(id);
+	}else{
+		collapse(id);
+	}
+}
+return false;
+}
+
+function LinkClick(index,hasChild,r){
+if(AutoCollapse && hasChild){
+	if(get('d' + index ).style.display=='none'){
+		collapseAll()
+		showParent(get('l' + index));
+		show(index);
+	}else{
+		collapseAll()
+		showParent(get('l' + index));	
+		collapse(index);
+	}
+}
+if(LastSelected!=-1){
+	get('l' + LastSelected).className = "unselected";
+}
+get('l' + index).className = "selected";
+LastSelected = index;
+return r;
+}
+
+function body_onmousemove(event){
+if(typeof(document.body.scrollTop)!='undefined'){
+if(parseInt(event.clientX)<5){
+window.scroll(0,document.body.scrollTop);}}
+if(typeof(window.scrollY)!='undefined'){
+if(parseInt(event.clientX)<5){
+window.scrollTo(0,window.scrollY);}}
+}
+
+window.defaultStatus = '';
+
+function body_onload(){
+get('loading').style.display='none';
+loaded = true;
+if(parent.parent.content.document.readyState){
+	if(parent.parent.content.document.readyState == 'complete'){
+		try{parent.parent.content.syn();}catch(e){};
+	}
+}else{
+	if(parent.parent.contentLoaded){
+		try{parent.parent.content.syn();}catch(e){};
+	}
+}
+}
+
+//-->
+</SCRIPT>
+<script language="JavaScript" src="languages.js"></script>
+
+</head>
+
+<body bgcolor="#ffffff" leftmargin="5" topmargin="5" marginwidth="5" marginheight="5" onmousemove="body_onmousemove(event);" onload="body_onload();">
+<div id="loading"><font color="#FF0000" size="1"> Loading table of contents... 
+</font><br><br></div>
+<script>SetEnv(0,true)</script><div><nobr><a href="#" onClick="return NodeClick('0')"><img id="imgn0" src="icons/daplus.gif" class="p"></a><a href="topics/1概述（Summary）/概述（Summary）.htm" onclick="return LinkClick('0',true,true)" onDblClick="return LinkDblClick('0')" target="content" title="1概述（Summary）.htm" onmousemove="window.status='1概述（Summary）.htm'"><img id="img0" src="icons/1.gif" class="p"> <span id="l0" class="unselected">1概述（Summary）.htm</span></a></nobr></div>
+<div id="d0" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/1概述（Summary）/基础规则（Basic Rules）.htm" onclick="return LinkClick('1',false,true)" target="content" title="基础规则（Basic Rules）.htm" onmousemove="window.status='基础规则（Basic Rules）.htm'"><img src="icons/11.gif" class="p"> <span id="l1" class="unselected">基础规则（Basic Rules）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/1概述（Summary）/神祇（Deities）.htm" onclick="return LinkClick('2',false,true)" target="content" title="神祇（Deities）.htm" onmousemove="window.status='神祇（Deities）.htm'"><img src="icons/11.gif" class="p"> <span id="l2" class="unselected">神祇（Deities）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/1概述（Summary）/阵营（Alignment）.htm" onclick="return LinkClick('3',false,true)" target="content" title="阵营（Alignment）.htm" onmousemove="window.status='阵营（Alignment）.htm'"><img src="icons/11.gif" class="p"> <span id="l3" class="unselected">阵营（Alignment）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/1概述（Summary）/等级与经验（LV&XP）.htm" onclick="return LinkClick('4',false,true)" target="content" title="等级与经验（LV&amp;XP）.htm" onmousemove="window.status='等级与经验（LV&amp;XP）.htm'"><img src="icons/11.gif" class="p"> <span id="l4" class="unselected">等级与经验（LV&amp;XP）.htm</span></a></nobr></div>
+</div><div><nobr><a href="#" onClick="return NodeClick('5')"><img id="imgn5" src="icons/tplus.gif" class="p"></a><a href="topics/2种族（Races）/种族（Races）.htm" onclick="return LinkClick('5',true,true)" onDblClick="return LinkDblClick('5')" target="content" title="2种族（Races）.htm" onmousemove="window.status='2种族（Races）.htm'"><img id="img5" src="icons/1.gif" class="p"> <span id="l5" class="unselected">2种族（Races）.htm</span></a></nobr></div>
+<div id="d5" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/2种族（Races）/矮人（Dwarves）.htm" onclick="return LinkClick('6',false,true)" target="content" title="矮人（Dwarves）.htm" onmousemove="window.status='矮人（Dwarves）.htm'"><img src="icons/11.gif" class="p"> <span id="l6" class="unselected">矮人（Dwarves）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/2种族（Races）/精灵（Elves）.htm" onclick="return LinkClick('7',false,true)" target="content" title="精灵（Elves）.htm" onmousemove="window.status='精灵（Elves）.htm'"><img src="icons/11.gif" class="p"> <span id="l7" class="unselected">精灵（Elves）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/2种族（Races）/侏儒（Gnomes）.htm" onclick="return LinkClick('8',false,true)" target="content" title="侏儒（Gnomes）.htm" onmousemove="window.status='侏儒（Gnomes）.htm'"><img src="icons/11.gif" class="p"> <span id="l8" class="unselected">侏儒（Gnomes）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/2种族（Races）/半精灵（Half-Elves）.htm" onclick="return LinkClick('9',false,true)" target="content" title="半精灵（Half-Elves）.htm" onmousemove="window.status='半精灵（Half-Elves）.htm'"><img src="icons/11.gif" class="p"> <span id="l9" class="unselected">半精灵（Half-Elves）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/2种族（Races）/半身人（Halflings）.htm" onclick="return LinkClick('10',false,true)" target="content" title="半身人（Halflings）.htm" onmousemove="window.status='半身人（Halflings）.htm'"><img src="icons/11.gif" class="p"> <span id="l10" class="unselected">半身人（Halflings）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/2种族（Races）/半兽人（Half-Orcs）.htm" onclick="return LinkClick('11',false,true)" target="content" title="半兽人（Half-Orcs）.htm" onmousemove="window.status='半兽人（Half-Orcs）.htm'"><img src="icons/11.gif" class="p"> <span id="l11" class="unselected">半兽人（Half-Orcs）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/2种族（Races）/人类（Humans）.htm" onclick="return LinkClick('12',false,true)" target="content" title="人类（Humans）.htm" onmousemove="window.status='人类（Humans）.htm'"><img src="icons/11.gif" class="p"> <span id="l12" class="unselected">人类（Humans）.htm</span></a></nobr></div>
+</div><div><nobr><a href="#" onClick="return NodeClick('13')"><img id="imgn13" src="icons/tplus.gif" class="p"></a><a href="topics/3职业（Classes）/3职业（Classes）.htm" onclick="return LinkClick('13',true,true)" onDblClick="return LinkDblClick('13')" target="content" title="3职业（Classes）.htm" onmousemove="window.status='3职业（Classes）.htm'"><img id="img13" src="icons/1.gif" class="p"> <span id="l13" class="unselected">3职业（Classes）.htm</span></a></nobr></div>
+<div id="d13" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><a href="#" onClick="return NodeClick('14')"><img id="imgn14" src="icons/tplus.gif" class="p"></a><a href="#" onclick="return LinkClick('14',true,false)" onDblClick="return LinkDblClick('14')" target="content" title="PHB基础职业（Basic Classes）" onmousemove="window.status='PHB基础职业（Basic Classes）'"><img id="img14" src="icons/1.gif" class="p"> <span id="l14" class="unselected">PHB基础职业（Basic Classes）</span></a></nobr></div>
+<div id="d14" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/3职业（Classes）/PHB基础职业（Basic Classes）/野蛮人（Barbarian）.htm" onclick="return LinkClick('15',false,true)" target="content" title="野蛮人（Barbarian）.htm" onmousemove="window.status='野蛮人（Barbarian）.htm'"><img src="icons/11.gif" class="p"> <span id="l15" class="unselected">野蛮人（Barbarian）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/3职业（Classes）/PHB基础职业（Basic Classes）/吟游诗人（Bard）.htm" onclick="return LinkClick('16',false,true)" target="content" title="吟游诗人（Bard）.htm" onmousemove="window.status='吟游诗人（Bard）.htm'"><img src="icons/11.gif" class="p"> <span id="l16" class="unselected">吟游诗人（Bard）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/3职业（Classes）/PHB基础职业（Basic Classes）/牧师（Cleric）.htm" onclick="return LinkClick('17',false,true)" target="content" title="牧师（Cleric）.htm" onmousemove="window.status='牧师（Cleric）.htm'"><img src="icons/11.gif" class="p"> <span id="l17" class="unselected">牧师（Cleric）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/3职业（Classes）/PHB基础职业（Basic Classes）/德鲁伊（Druid）.htm" onclick="return LinkClick('18',false,true)" target="content" title="德鲁伊（Druid）.htm" onmousemove="window.status='德鲁伊（Druid）.htm'"><img src="icons/11.gif" class="p"> <span id="l18" class="unselected">德鲁伊（Druid）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/3职业（Classes）/PHB基础职业（Basic Classes）/战士（Fighter）.htm" onclick="return LinkClick('19',false,true)" target="content" title="战士（Fighter）.htm" onmousemove="window.status='战士（Fighter）.htm'"><img src="icons/11.gif" class="p"> <span id="l19" class="unselected">战士（Fighter）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/3职业（Classes）/PHB基础职业（Basic Classes）/武僧（Monk）.htm" onclick="return LinkClick('20',false,true)" target="content" title="武僧（Monk）.htm" onmousemove="window.status='武僧（Monk）.htm'"><img src="icons/11.gif" class="p"> <span id="l20" class="unselected">武僧（Monk）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/3职业（Classes）/PHB基础职业（Basic Classes）/圣武士（Paladin）.htm" onclick="return LinkClick('21',false,true)" target="content" title="圣武士（Paladin）.htm" onmousemove="window.status='圣武士（Paladin）.htm'"><img src="icons/11.gif" class="p"> <span id="l21" class="unselected">圣武士（Paladin）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/3职业（Classes）/PHB基础职业（Basic Classes）/巡林客（Ranger）.htm" onclick="return LinkClick('22',false,true)" target="content" title="巡林客（Ranger）.htm" onmousemove="window.status='巡林客（Ranger）.htm'"><img src="icons/11.gif" class="p"> <span id="l22" class="unselected">巡林客（Ranger）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/3职业（Classes）/PHB基础职业（Basic Classes）/游荡者（Rogue）.htm" onclick="return LinkClick('23',false,true)" target="content" title="游荡者（Rogue）.htm" onmousemove="window.status='游荡者（Rogue）.htm'"><img src="icons/11.gif" class="p"> <span id="l23" class="unselected">游荡者（Rogue）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/3职业（Classes）/PHB基础职业（Basic Classes）/术士（Sorcerer）.htm" onclick="return LinkClick('24',false,true)" target="content" title="术士（Sorcerer）.htm" onmousemove="window.status='术士（Sorcerer）.htm'"><img src="icons/11.gif" class="p"> <span id="l24" class="unselected">术士（Sorcerer）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/3职业（Classes）/PHB基础职业（Basic Classes）/法师（Wizard）.htm" onclick="return LinkClick('25',false,true)" target="content" title="法师（Wizard）.htm" onmousemove="window.status='法师（Wizard）.htm'"><img src="icons/11.gif" class="p"> <span id="l25" class="unselected">法师（Wizard）.htm</span></a></nobr></div>
+</div><div><nobr><img src="icons/line.gif" class="p"><a href="#" onClick="return NodeClick('26')"><img id="imgn26" src="icons/tplus.gif" class="p"></a><a href="topics/3职业（Classes）/进阶职业（Prestige classes）.htm" onclick="return LinkClick('26',true,true)" onDblClick="return LinkDblClick('26')" target="content" title="进阶职业（Prestige classes）.htm" onmousemove="window.status='进阶职业（Prestige classes）.htm'"><img id="img26" src="icons/1.gif" class="p"> <span id="l26" class="unselected">进阶职业（Prestige classes）.htm</span></a></nobr></div>
+<div id="d26" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/3职业（Classes）/PHB进阶职业（Prestige Classes）/决斗家（Duelist）.htm" onclick="return LinkClick('27',false,true)" target="content" title="决斗家（Duelist）.htm" onmousemove="window.status='决斗家（Duelist）.htm'"><img src="icons/11.gif" class="p"> <span id="l27" class="unselected">决斗家（Duelist）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/3职业（Classes）/PHB进阶职业（Prestige Classes）/刺客（Assassin）.htm" onclick="return LinkClick('28',false,true)" target="content" title="刺客（Assassin）.htm" onmousemove="window.status='刺客（Assassin）.htm'"><img src="icons/11.gif" class="p"> <span id="l28" class="unselected">刺客（Assassin）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/3职业（Classes）/PHB进阶职业（Prestige Classes）/博学士（Loremaster）.htm" onclick="return LinkClick('29',false,true)" target="content" title="博学士（Loremaster）.htm" onmousemove="window.status='博学士（Loremaster）.htm'"><img src="icons/11.gif" class="p"> <span id="l29" class="unselected">博学士（Loremaster）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/3职业（Classes）/PHB进阶职业（Prestige Classes）/咒法召唤师（Thaumaturgist）.htm" onclick="return LinkClick('30',false,true)" target="content" title="咒法召唤师（Thaumaturgist）.htm" onmousemove="window.status='咒法召唤师（Thaumaturgist）.htm'"><img src="icons/11.gif" class="p"> <span id="l30" class="unselected">咒法召唤师（Thaumaturgist）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/3职业（Classes）/PHB进阶职业（Prestige Classes）/大地旅者（Horizon Walker）.htm" onclick="return LinkClick('31',false,true)" target="content" title="大地旅者（Horizon Walker）.htm" onmousemove="window.status='大地旅者（Horizon Walker）.htm'"><img src="icons/11.gif" class="p"> <span id="l31" class="unselected">大地旅者（Horizon Walker）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/3职业（Classes）/PHB进阶职业（Prestige Classes）/大法师（Archmage）.htm" onclick="return LinkClick('32',false,true)" target="content" title="大法师（Archmage）.htm" onmousemove="window.status='大法师（Archmage）.htm'"><img src="icons/11.gif" class="p"> <span id="l32" class="unselected">大法师（Archmage）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/3职业（Classes）/PHB进阶职业（Prestige Classes）/大祭司（Hierophant）.htm" onclick="return LinkClick('33',false,true)" target="content" title="大祭司（Hierophant）.htm" onmousemove="window.status='大祭司（Hierophant）.htm'"><img src="icons/11.gif" class="p"> <span id="l33" class="unselected">大祭司（Hierophant）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/3职业（Classes）/PHB进阶职业（Prestige Classes）/奥法骑士（Eldritch Knight）.htm" onclick="return LinkClick('34',false,true)" target="content" title="奥法骑士（Eldritch Knight）.htm" onmousemove="window.status='奥法骑士（Eldritch Knight）.htm'"><img src="icons/11.gif" class="p"> <span id="l34" class="unselected">奥法骑士（Eldritch Knight）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/3职业（Classes）/PHB进阶职业（Prestige Classes）/影舞者（Shadowdancer）.htm" onclick="return LinkClick('35',false,true)" target="content" title="影舞者（Shadowdancer）.htm" onmousemove="window.status='影舞者（Shadowdancer）.htm'"><img src="icons/11.gif" class="p"> <span id="l35" class="unselected">影舞者（Shadowdancer）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/3职业（Classes）/PHB进阶职业（Prestige Classes）/暗黑卫士（Blackguard）.htm" onclick="return LinkClick('36',false,true)" target="content" title="暗黑卫士（Blackguard）.htm" onmousemove="window.status='暗黑卫士（Blackguard）.htm'"><img src="icons/11.gif" class="p"> <span id="l36" class="unselected">暗黑卫士（Blackguard）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/3职业（Classes）/PHB进阶职业（Prestige Classes）/矮人防御者（Dwarven Defender）.htm" onclick="return LinkClick('37',false,true)" target="content" title="矮人防御者（Dwarven Defender）.htm" onmousemove="window.status='矮人防御者（Dwarven Defender）.htm'"><img src="icons/11.gif" class="p"> <span id="l37" class="unselected">矮人防御者（Dwarven Defender）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/3职业（Classes）/PHB进阶职业（Prestige Classes）/秘术师（Mystic Theurge）.htm" onclick="return LinkClick('38',false,true)" target="content" title="秘术师（Mystic Theurge）.htm" onmousemove="window.status='秘术师（Mystic Theurge）.htm'"><img src="icons/11.gif" class="p"> <span id="l38" class="unselected">秘术师（Mystic Theurge）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/3职业（Classes）/PHB进阶职业（Prestige Classes）/诡术师（Arcane Trickster）.htm" onclick="return LinkClick('39',false,true)" target="content" title="诡术师（Arcane Trickster）.htm" onmousemove="window.status='诡术师（Arcane Trickster）.htm'"><img src="icons/11.gif" class="p"> <span id="l39" class="unselected">诡术师（Arcane Trickster）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/3职业（Classes）/PHB进阶职业（Prestige Classes）/魔射手（Arcane Archer）.htm" onclick="return LinkClick('40',false,true)" target="content" title="魔射手（Arcane Archer）.htm" onmousemove="window.status='魔射手（Arcane Archer）.htm'"><img src="icons/11.gif" class="p"> <span id="l40" class="unselected">魔射手（Arcane Archer）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/3职业（Classes）/PHB进阶职业（Prestige Classes）/龙脉术士（Dragon Disciple）.htm" onclick="return LinkClick('41',false,true)" target="content" title="龙脉术士（Dragon Disciple）.htm" onmousemove="window.status='龙脉术士（Dragon Disciple）.htm'"><img src="icons/11.gif" class="p"> <span id="l41" class="unselected">龙脉术士（Dragon Disciple）.htm</span></a></nobr></div>
+</div><div><nobr><img src="icons/line.gif" class="p"><a href="#" onClick="return NodeClick('42')"><img id="imgn42" src="icons/tplus.gif" class="p"></a><a href="#" onclick="return LinkClick('42',true,false)" onDblClick="return LinkDblClick('42')" target="content" title="NPC职业（NPC Classes）" onmousemove="window.status='NPC职业（NPC Classes）'"><img id="img42" src="icons/1.gif" class="p"> <span id="l42" class="unselected">NPC职业（NPC Classes）</span></a></nobr></div>
+<div id="d42" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/3职业（Classes）/NPC职业（NPC Classes）/导师（Adept）.htm" onclick="return LinkClick('43',false,true)" target="content" title="导师（Adept）.htm" onmousemove="window.status='导师（Adept）.htm'"><img src="icons/11.gif" class="p"> <span id="l43" class="unselected">导师（Adept）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/3职业（Classes）/NPC职业（NPC Classes）/平民（Commoner）.htm" onclick="return LinkClick('44',false,true)" target="content" title="平民（Commoner）.htm" onmousemove="window.status='平民（Commoner）.htm'"><img src="icons/11.gif" class="p"> <span id="l44" class="unselected">平民（Commoner）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/3职业（Classes）/NPC职业（NPC Classes）/望族（Aristocrat）.htm" onclick="return LinkClick('45',false,true)" target="content" title="望族（Aristocrat）.htm" onmousemove="window.status='望族（Aristocrat）.htm'"><img src="icons/11.gif" class="p"> <span id="l45" class="unselected">望族（Aristocrat）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/3职业（Classes）/NPC职业（NPC Classes）/武者（Warrior）.htm" onclick="return LinkClick('46',false,true)" target="content" title="武者（Warrior）.htm" onmousemove="window.status='武者（Warrior）.htm'"><img src="icons/11.gif" class="p"> <span id="l46" class="unselected">武者（Warrior）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/3职业（Classes）/NPC职业（NPC Classes）/专家（Expert）.htm" onclick="return LinkClick('47',false,true)" target="content" title="专家（Expert）.htm" onmousemove="window.status='专家（Expert）.htm'"><img src="icons/11.gif" class="p"> <span id="l47" class="unselected">专家（Expert）.htm</span></a></nobr></div>
+</div><div><nobr><img src="icons/line.gif" class="p"><a href="#" onClick="return NodeClick('48')"><img id="imgn48" src="icons/tplus.gif" class="p"></a><a href="#" onclick="return LinkClick('48',true,false)" onDblClick="return LinkDblClick('48')" target="content" title="伙伴（Companion）" onmousemove="window.status='伙伴（Companion）'"><img id="img48" src="icons/1.gif" class="p"> <span id="l48" class="unselected">伙伴（Companion）</span></a></nobr></div>
+<div id="d48" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/3职业（Classes）/PHB基础职业（Basic Classes）/动物伙伴（Animal Companion）.htm" onclick="return LinkClick('49',false,true)" target="content" title="动物伙伴（Animal Companion）.htm" onmousemove="window.status='动物伙伴（Animal Companion）.htm'"><img src="icons/11.gif" class="p"> <span id="l49" class="unselected">动物伙伴（Animal Companion）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/3职业（Classes）/PHB基础职业（Basic Classes）/魔宠（Familiar）.htm" onclick="return LinkClick('50',false,true)" target="content" title="魔宠（Familiar）.htm" onmousemove="window.status='魔宠（Familiar）.htm'"><img src="icons/11.gif" class="p"> <span id="l50" class="unselected">魔宠（Familiar）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/3职业（Classes）/PHB基础职业（Basic Classes）/座骑（Mount）.htm" onclick="return LinkClick('51',false,true)" target="content" title="座骑（Mount）.htm" onmousemove="window.status='座骑（Mount）.htm'"><img src="icons/11.gif" class="p"> <span id="l51" class="unselected">座骑（Mount）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/3职业（Classes）/PHB进阶职业（Prestige Classes）/炼狱仆役（Fiendish Servant）.htm" onclick="return LinkClick('52',false,true)" target="content" title="炼狱仆役（Fiendish Servant）.htm" onmousemove="window.status='炼狱仆役（Fiendish Servant）.htm'"><img src="icons/11.gif" class="p"> <span id="l52" class="unselected">炼狱仆役（Fiendish Servant）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/3职业（Classes）/伙伴（Companion）/部属（Cohorts）.htm" onclick="return LinkClick('53',false,true)" target="content" title="部属（Cohorts）.htm" onmousemove="window.status='部属（Cohorts）.htm'"><img src="icons/11.gif" class="p"> <span id="l53" class="unselected">部属（Cohorts）.htm</span></a></nobr></div>
+</div><div><nobr><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/3职业（Classes）/兼职人物（Multiclass Characters）.htm" onclick="return LinkClick('54',false,true)" target="content" title="兼职人物（Multiclass Characters）.htm" onmousemove="window.status='兼职人物（Multiclass Characters）.htm'"><img src="icons/11.gif" class="p"> <span id="l54" class="unselected">兼职人物（Multiclass Characters）.htm</span></a></nobr></div>
+</div><div><nobr><a href="#" onClick="return NodeClick('55')"><img id="imgn55" src="icons/tplus.gif" class="p"></a><a href="topics/4技能（Skills）/4技能 (Skills).htm" onclick="return LinkClick('55',true,true)" onDblClick="return LinkDblClick('55')" target="content" title="4技能 (Skills).htm" onmousemove="window.status='4技能 (Skills).htm'"><img id="img55" src="icons/1.gif" class="p"> <span id="l55" class="unselected">4技能 (Skills).htm</span></a></nobr></div>
+<div id="d55" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/4技能（Skills）/技能详述(Skills Descriptions).htm" onclick="return LinkClick('56',false,true)" target="content" title="技能详述(Skills Descriptions).htm" onmousemove="window.status='技能详述(Skills Descriptions).htm'"><img src="icons/11.gif" class="p"> <span id="l56" class="unselected">技能详述(Skills Descriptions).htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/4技能（Skills）/技能共效（Skill Synergy）.htm" onclick="return LinkClick('57',false,true)" target="content" title="技能共效（Skill Synergy）.htm" onmousemove="window.status='技能共效（Skill Synergy）.htm'"><img src="icons/11.gif" class="p"> <span id="l57" class="unselected">技能共效（Skill Synergy）.htm</span></a></nobr></div>
+</div><div><nobr><a href="#" onClick="return NodeClick('58')"><img id="imgn58" src="icons/tplus.gif" class="p"></a><a href="topics/5专长（Feats）/5专长（feat）.htm" onclick="return LinkClick('58',true,true)" onDblClick="return LinkDblClick('58')" target="content" title="5专长（feat）.htm" onmousemove="window.status='5专长（feat）.htm'"><img id="img58" src="icons/1.gif" class="p"> <span id="l58" class="unselected">5专长（feat）.htm</span></a></nobr></div>
+<div id="d58" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/5专长（Feats）/一般专长（General Feat）.htm" onclick="return LinkClick('59',false,true)" target="content" title="一般专长（General Feat）.htm" onmousemove="window.status='一般专长（General Feat）.htm'"><img src="icons/11.gif" class="p"> <span id="l59" class="unselected">一般专长（General Feat）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/5专长（Feats）/物品制造专长（Item Creation Feat）.htm" onclick="return LinkClick('60',false,true)" target="content" title="物品制造专长（Item Creation Feat）.htm" onmousemove="window.status='物品制造专长（Item Creation Feat）.htm'"><img src="icons/11.gif" class="p"> <span id="l60" class="unselected">物品制造专长（Item Creation Feat）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/5专长（Feats）/超魔专长（Metamagic Feat）.htm" onclick="return LinkClick('61',false,true)" target="content" title="超魔专长（Metamagic Feat）.htm" onmousemove="window.status='超魔专长（Metamagic Feat）.htm'"><img src="icons/11.gif" class="p"> <span id="l61" class="unselected">超魔专长（Metamagic Feat）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/5专长（Feats）/怪物专长（Monster Feat）.htm" onclick="return LinkClick('62',false,true)" target="content" title="怪物专长（Monster Feat）" onmousemove="window.status='怪物专长（Monster Feat）'"><img src="icons/11.gif" class="p"> <span id="l62" class="unselected">怪物专长（Monster Feat）</span></a></nobr></div>
+</div><div><nobr><a href="#" onClick="return NodeClick('63')"><img id="imgn63" src="icons/tplus.gif" class="p"></a><a href="#" onclick="return LinkClick('63',true,false)" onDblClick="return LinkDblClick('63')" target="content" title="6装备（Equipment）" onmousemove="window.status='6装备（Equipment）'"><img id="img63" src="icons/1.gif" class="p"> <span id="l63" class="unselected">6装备（Equipment）</span></a></nobr></div>
+<div id="d63" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/6装备（Equipment）/财产（Assets）.htm" onclick="return LinkClick('64',false,true)" target="content" title="财产（Assets）.htm" onmousemove="window.status='财产（Assets）.htm'"><img src="icons/11.gif" class="p"> <span id="l64" class="unselected">财产（Assets）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/6装备（Equipment）/负重（Weight）.htm" onclick="return LinkClick('65',false,true)" target="content" title="负重（Weight）.htm" onmousemove="window.status='负重（Weight）.htm'"><img src="icons/11.gif" class="p"> <span id="l65" class="unselected">负重（Weight）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/6装备（Equipment）/商品（Goods）.htm" onclick="return LinkClick('66',false,true)" target="content" title="商品（Goods）.htm" onmousemove="window.status='商品（Goods）.htm'"><img src="icons/11.gif" class="p"> <span id="l66" class="unselected">商品（Goods）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/6装备（Equipment）/武器（Weapons）.htm" onclick="return LinkClick('67',false,true)" target="content" title="武器（Weapons）.htm" onmousemove="window.status='武器（Weapons）.htm'"><img src="icons/11.gif" class="p"> <span id="l67" class="unselected">武器（Weapons）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/6装备（Equipment）/防具（Armor）.htm" onclick="return LinkClick('68',false,true)" target="content" title="防具（Armor）.htm" onmousemove="window.status='防具（Armor）.htm'"><img src="icons/11.gif" class="p"> <span id="l68" class="unselected">防具（Armor）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/6装备（Equipment）/服务（Service）.htm" onclick="return LinkClick('69',false,true)" target="content" title="服务（Service）.htm" onmousemove="window.status='服务（Service）.htm'"><img src="icons/11.gif" class="p"> <span id="l69" class="unselected">服务（Service）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/6装备（Equipment）/特殊材料（Special Materials）.htm" onclick="return LinkClick('70',false,true)" target="content" title="特殊材料（Special Materials）.htm" onmousemove="window.status='特殊材料（Special Materials）.htm'"><img src="icons/11.gif" class="p"> <span id="l70" class="unselected">特殊材料（Special Materials）.htm</span></a></nobr></div>
+</div><div><nobr><a href="#" onClick="return NodeClick('71')"><img id="imgn71" src="icons/tplus.gif" class="p"></a><a href="topics/7魔法物品（Magic Items）/7魔法物品（Magic Items）.htm" onclick="return LinkClick('71',true,true)" onDblClick="return LinkDblClick('71')" target="content" title="7魔法物品（Magic Items）.htm" onmousemove="window.status='7魔法物品（Magic Items）.htm'"><img id="img71" src="icons/1.gif" class="p"> <span id="l71" class="unselected">7魔法物品（Magic Items）.htm</span></a></nobr></div>
+<div id="d71" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/7魔法物品（Magic Items）/防具（Armor）.htm" onclick="return LinkClick('72',false,true)" target="content" title="防具（Armor）.htm" onmousemove="window.status='防具（Armor）.htm'"><img src="icons/11.gif" class="p"> <span id="l72" class="unselected">防具（Armor）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/7魔法物品（Magic Items）/药水 (Potions).htm" onclick="return LinkClick('73',false,true)" target="content" title="药水 (Potions).htm" onmousemove="window.status='药水 (Potions).htm'"><img src="icons/11.gif" class="p"> <span id="l73" class="unselected">药水 (Potions).htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/7魔法物品（Magic Items）/戒指（Rings）.htm" onclick="return LinkClick('74',false,true)" target="content" title="戒指（Rings）.htm" onmousemove="window.status='戒指（Rings）.htm'"><img src="icons/11.gif" class="p"> <span id="l74" class="unselected">戒指（Rings）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/7魔法物品（Magic Items）/权杖（Rod）.htm" onclick="return LinkClick('75',false,true)" target="content" title="权杖（Rod）.htm" onmousemove="window.status='权杖（Rod）.htm'"><img src="icons/11.gif" class="p"> <span id="l75" class="unselected">权杖（Rod）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/7魔法物品（Magic Items）/卷轴（Scrolls）.htm" onclick="return LinkClick('76',false,true)" target="content" title="卷轴（Scrolls）.htm" onmousemove="window.status='卷轴（Scrolls）.htm'"><img src="icons/11.gif" class="p"> <span id="l76" class="unselected">卷轴（Scrolls）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/7魔法物品（Magic Items）/法杖（Staff）.htm" onclick="return LinkClick('77',false,true)" target="content" title="法杖（Staff）.htm" onmousemove="window.status='法杖（Staff）.htm'"><img src="icons/11.gif" class="p"> <span id="l77" class="unselected">法杖（Staff）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/7魔法物品（Magic Items）/魔杖（Wands）.htm" onclick="return LinkClick('78',false,true)" target="content" title="魔杖（Wands）.htm" onmousemove="window.status='魔杖（Wands）.htm'"><img src="icons/11.gif" class="p"> <span id="l78" class="unselected">魔杖（Wands）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/7魔法物品（Magic Items）/武器（Weapons）.htm" onclick="return LinkClick('79',false,true)" target="content" title="武器（Weapons）.htm" onmousemove="window.status='武器（Weapons）.htm'"><img src="icons/11.gif" class="p"> <span id="l79" class="unselected">武器（Weapons）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/7魔法物品（Magic Items）/奇物（Wondrous Items）.htm" onclick="return LinkClick('80',false,true)" target="content" title="奇物（Wondrous Items）.htm" onmousemove="window.status='奇物（Wondrous Items）.htm'"><img src="icons/11.gif" class="p"> <span id="l80" class="unselected">奇物（Wondrous Items）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><a href="#" onClick="return NodeClick('81')"><img id="imgn81" src="icons/tplus.gif" class="p"></a><a href="#" onclick="return LinkClick('81',true,false)" onDblClick="return LinkDblClick('81')" target="content" title="其他（Others）" onmousemove="window.status='其他（Others）'"><img id="img81" src="icons/1.gif" class="p"> <span id="l81" class="unselected">其他（Others）</span></a></nobr></div>
+<div id="d81" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/7魔法物品（Magic Items）/神器（Artifacts）.htm" onclick="return LinkClick('82',false,true)" target="content" title="神器（Artifacts）.htm" onmousemove="window.status='神器（Artifacts）.htm'"><img src="icons/11.gif" class="p"> <span id="l82" class="unselected">神器（Artifacts）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/7魔法物品（Magic Items）/智能魔法物品（Intelligent Items）.htm" onclick="return LinkClick('83',false,true)" target="content" title="智能魔法物品（Intelligent Items）.htm" onmousemove="window.status='智能魔法物品（Intelligent Items）.htm'"><img src="icons/11.gif" class="p"> <span id="l83" class="unselected">智能魔法物品（Intelligent Items）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/7魔法物品（Magic Items）/诅咒物品（Cursed Items）.htm" onclick="return LinkClick('84',false,true)" target="content" title="诅咒物品（Cursed Items）.htm" onmousemove="window.status='诅咒物品（Cursed Items）.htm'"><img src="icons/11.gif" class="p"> <span id="l84" class="unselected">诅咒物品（Cursed Items）.htm</span></a></nobr></div>
+</div><div><nobr><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/7魔法物品（Magic Items）/制造魔法物品（Magic Item Creation）.htm" onclick="return LinkClick('85',false,true)" target="content" title="制造魔法物品（Magic Item Creation）.htm" onmousemove="window.status='制造魔法物品（Magic Item Creation）.htm'"><img src="icons/11.gif" class="p"> <span id="l85" class="unselected">制造魔法物品（Magic Item Creation）.htm</span></a></nobr></div>
+</div><div><nobr><a href="#" onClick="return NodeClick('86')"><img id="imgn86" src="icons/tplus.gif" class="p"></a><a href="topics/8战斗（Combat）/8战斗（Combat）.htm" onclick="return LinkClick('86',true,true)" onDblClick="return LinkDblClick('86')" target="content" title="8战斗（Combat）.htm" onmousemove="window.status='8战斗（Combat）.htm'"><img id="img86" src="icons/1.gif" class="p"> <span id="l86" class="unselected">8战斗（Combat）.htm</span></a></nobr></div>
+<div id="d86" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/8战斗（Combat）/战斗动作（Actions In Combat）.htm" onclick="return LinkClick('87',false,true)" target="content" title="战斗动作（Actions In Combat）.htm" onmousemove="window.status='战斗动作（Actions In Combat）.htm'"><img src="icons/11.gif" class="p"> <span id="l87" class="unselected">战斗动作（Actions In Combat）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/8战斗（Combat）/特殊能力（Special Abilities）.htm" onclick="return LinkClick('88',false,true)" target="content" title="特殊能力（Special Abilities）.htm" onmousemove="window.status='特殊能力（Special Abilities）.htm'"><img src="icons/11.gif" class="p"> <span id="l88" class="unselected">特殊能力（Special Abilities）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/8战斗（Combat）/状态（Conditions）.htm" onclick="return LinkClick('89',false,true)" target="content" title="状态（Conditions）.htm" onmousemove="window.status='状态（Conditions）.htm'"><img src="icons/11.gif" class="p"> <span id="l89" class="unselected">状态（Conditions）.htm</span></a></nobr></div>
+</div><div><nobr><a href="#" onClick="return NodeClick('90')"><img id="imgn90" src="icons/tplus.gif" class="p"></a><a href="#" onclick="return LinkClick('90',true,false)" onDblClick="return LinkDblClick('90')" target="content" title="9冒险（Adventure）" onmousemove="window.status='9冒险（Adventure）'"><img id="img90" src="icons/1.gif" class="p"> <span id="l90" class="unselected">9冒险（Adventure）</span></a></nobr></div>
+<div id="d90" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/9冒险（Adventure）/移动（Movement）.htm" onclick="return LinkClick('91',false,true)" target="content" title="移动（Movement）.htm" onmousemove="window.status='移动（Movement）.htm'"><img src="icons/11.gif" class="p"> <span id="l91" class="unselected">移动（Movement）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/9冒险（Adventure）/探索（Exploration）.htm" onclick="return LinkClick('92',false,true)" target="content" title="探索（Exploration）.htm" onmousemove="window.status='探索（Exploration）.htm'"><img src="icons/11.gif" class="p"> <span id="l92" class="unselected">探索（Exploration）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><a href="#" onClick="return NodeClick('93')"><img id="imgn93" src="icons/tplus.gif" class="p"></a><a href="topics/9冒险（Adventure）/环境 (Environment).htm" onclick="return LinkClick('93',true,true)" onDblClick="return LinkDblClick('93')" target="content" title="环境 (Environment).htm" onmousemove="window.status='环境 (Environment).htm'"><img id="img93" src="icons/1.gif" class="p"> <span id="l93" class="unselected">环境 (Environment).htm</span></a></nobr></div>
+<div id="d93" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/9冒险（Adventure）/地下城 (Dungeons).htm" onclick="return LinkClick('94',false,true)" target="content" title="地下城 (Dungeons).htm" onmousemove="window.status='地下城 (Dungeons).htm'"><img src="icons/11.gif" class="p"> <span id="l94" class="unselected">地下城 (Dungeons).htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/9冒险（Adventure）/野外 (Wilderness).htm" onclick="return LinkClick('95',false,true)" target="content" title="野外 (Wilderness).htm" onmousemove="window.status='野外 (Wilderness).htm'"><img src="icons/11.gif" class="p"> <span id="l95" class="unselected">野外 (Wilderness).htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/9冒险（Adventure）/城市（Urban）.htm" onclick="return LinkClick('96',false,true)" target="content" title="城市（Urban）.htm" onmousemove="window.status='城市（Urban）.htm'"><img src="icons/11.gif" class="p"> <span id="l96" class="unselected">城市（Urban）.htm</span></a></nobr></div>
+</div><div><nobr><img src="icons/line.gif" class="p"><a href="#" onClick="return NodeClick('97')"><img id="imgn97" src="icons/tplus.gif" class="p"></a><a href="topics/9冒险（Adventure）/陷阱（Traps）.htm" onclick="return LinkClick('97',true,true)" onDblClick="return LinkDblClick('97')" target="content" title="陷阱（Traps）.htm" onmousemove="window.status='陷阱（Traps）.htm'"><img id="img97" src="icons/1.gif" class="p"> <span id="l97" class="unselected">陷阱（Traps）.htm</span></a></nobr></div>
+<div id="d97" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/9冒险（Adventure）/范例陷阱 (Sample Traps).htm" onclick="return LinkClick('98',false,true)" target="content" title="范例陷阱 (Sample Traps).htm" onmousemove="window.status='范例陷阱 (Sample Traps).htm'"><img src="icons/11.gif" class="p"> <span id="l98" class="unselected">范例陷阱 (Sample Traps).htm</span></a></nobr></div>
+</div><div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/9冒险（Adventure）/宝藏（Treasure）.htm" onclick="return LinkClick('99',false,true)" target="content" title="宝藏（Treasure）.htm" onmousemove="window.status='宝藏（Treasure）.htm'"><img src="icons/11.gif" class="p"> <span id="l99" class="unselected">宝藏（Treasure）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><a href="#" onClick="return NodeClick('100')"><img id="imgn100" src="icons/uaplus.gif" class="p"></a><a href="topics/9冒险（Adventure）/位面（Planes）.htm" onclick="return LinkClick('100',true,true)" onDblClick="return LinkDblClick('100')" target="content" title="位面（Planes）.htm" onmousemove="window.status='位面（Planes）.htm'"><img id="img100" src="icons/1.gif" class="p"> <span id="l100" class="unselected">位面（Planes）.htm</span></a></nobr></div>
+<div id="d100" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/blank.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/9冒险（Adventure）/位面描述（Plane Descriptions）.htm" onclick="return LinkClick('101',false,true)" target="content" title="位面描述（Plane Descriptions）" onmousemove="window.status='位面描述（Plane Descriptions）'"><img src="icons/11.gif" class="p"> <span id="l101" class="unselected">位面描述（Plane Descriptions）</span></a></nobr></div>
+</div></div><div><nobr><a href="#" onClick="return NodeClick('102')"><img id="imgn102" src="icons/tplus.gif" class="p"></a><a href="topics/10法术（Spells）/施法（Casting Spells）.htm" onclick="return LinkClick('102',true,true)" onDblClick="return LinkDblClick('102')" target="content" title="10法术（Spells）" onmousemove="window.status='10法术（Spells）'"><img id="img102" src="icons/1.gif" class="p"> <span id="l102" class="unselected">10法术（Spells）</span></a></nobr></div>
+<div id="d102" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/10法术（Spells）/奥术和神术（Arcane Spell & Divine Spell）.htm" onclick="return LinkClick('103',false,true)" target="content" title="奥术和神术（Arcane Spell &amp; Divine Spell）.htm" onmousemove="window.status='奥术和神术（Arcane Spell &amp; Divine Spell）.htm'"><img src="icons/11.gif" class="p"> <span id="l103" class="unselected">奥术和神术（Arcane Spell &amp; Divine Spell）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/10法术（Spells）/法术描述（Spell Descriptions）.htm" onclick="return LinkClick('104',false,true)" target="content" title="法术描述（Spell Descriptions）.htm" onmousemove="window.status='法术描述（Spell Descriptions）.htm'"><img src="icons/11.gif" class="p"> <span id="l104" class="unselected">法术描述（Spell Descriptions）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><a href="#" onClick="return NodeClick('105')"><img id="imgn105" src="icons/tplus.gif" class="p"></a><a href="#" onclick="return LinkClick('105',true,false)" onDblClick="return LinkDblClick('105')" target="content" title="职业法术列表（Spell List）" onmousemove="window.status='职业法术列表（Spell List）'"><img id="img105" src="icons/1.gif" class="p"> <span id="l105" class="unselected">职业法术列表（Spell List）</span></a></nobr></div>
+<div id="d105" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/10法术（Spells）/职业法术列表（Spell List）/吟游诗人法术列表（Bard Spells）.htm" onclick="return LinkClick('106',false,true)" target="content" title="吟游诗人法术列表（Bard Spells）.htm" onmousemove="window.status='吟游诗人法术列表（Bard Spells）.htm'"><img src="icons/11.gif" class="p"> <span id="l106" class="unselected">吟游诗人法术列表（Bard Spells）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/10法术（Spells）/职业法术列表（Spell List）/牧师法术列表（Cleric Spells）.htm" onclick="return LinkClick('107',false,true)" target="content" title="牧师法术列表（Cleric Spells）.htm" onmousemove="window.status='牧师法术列表（Cleric Spells）.htm'"><img src="icons/11.gif" class="p"> <span id="l107" class="unselected">牧师法术列表（Cleric Spells）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/10法术（Spells）/职业法术列表（Spell List）/德鲁伊法术列表（Druid Spells）.htm" onclick="return LinkClick('108',false,true)" target="content" title="德鲁伊法术列表（Druid Spells）.htm" onmousemove="window.status='德鲁伊法术列表（Druid Spells）.htm'"><img src="icons/11.gif" class="p"> <span id="l108" class="unselected">德鲁伊法术列表（Druid Spells）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/10法术（Spells）/职业法术列表（Spell List）/圣武士法术列表（Paladin Spells）.htm" onclick="return LinkClick('109',false,true)" target="content" title="圣武士法术列表（Paladin Spells）.htm" onmousemove="window.status='圣武士法术列表（Paladin Spells）.htm'"><img src="icons/11.gif" class="p"> <span id="l109" class="unselected">圣武士法术列表（Paladin Spells）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/10法术（Spells）/职业法术列表（Spell List）/巡林客法术列表（Ranger Spells）.htm" onclick="return LinkClick('110',false,true)" target="content" title="巡林客法术列表（Ranger Spells）.htm" onmousemove="window.status='巡林客法术列表（Ranger Spells）.htm'"><img src="icons/11.gif" class="p"> <span id="l110" class="unselected">巡林客法术列表（Ranger Spells）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/10法术（Spells）/职业法术列表（Spell List）/术士与法师法术列表（Sorcerer & Wizard Spells）.htm" onclick="return LinkClick('111',false,true)" target="content" title="术士与法师法术列表（Sorcerer &amp; Wizard Spells）.htm" onmousemove="window.status='术士与法师法术列表（Sorcerer &amp; Wizard Spells）.htm'"><img src="icons/11.gif" class="p"> <span id="l111" class="unselected">术士与法师法术列表（Sorcerer &amp; Wizard Spells）.htm</span></a></nobr></div>
+</div><div><nobr><img src="icons/line.gif" class="p"><a href="#" onClick="return NodeClick('112')"><img id="imgn112" src="icons/uaplus.gif" class="p"></a><a href="#" onclick="return LinkClick('112',true,false)" onDblClick="return LinkDblClick('112')" target="content" title="法术字母索引" onmousemove="window.status='法术字母索引'"><img id="img112" src="icons/1.gif" class="p"> <span id="l112" class="unselected">法术字母索引</span></a></nobr></div>
+<div id="d112" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/blank.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/10法术（Spells）/法术字母索引/法术A.htm" onclick="return LinkClick('113',false,true)" target="content" title="法术【A】.htm" onmousemove="window.status='法术【A】.htm'"><img src="icons/11.gif" class="p"> <span id="l113" class="unselected">法术【A】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/blank.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/10法术（Spells）/法术字母索引/法术B.htm" onclick="return LinkClick('114',false,true)" target="content" title="法术【B】.htm" onmousemove="window.status='法术【B】.htm'"><img src="icons/11.gif" class="p"> <span id="l114" class="unselected">法术【B】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/blank.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/10法术（Spells）/法术字母索引/法术C.htm" onclick="return LinkClick('115',false,true)" target="content" title="法术【C】.htm" onmousemove="window.status='法术【C】.htm'"><img src="icons/11.gif" class="p"> <span id="l115" class="unselected">法术【C】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/blank.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/10法术（Spells）/法术字母索引/法术D.htm" onclick="return LinkClick('116',false,true)" target="content" title="法术【D】.htm" onmousemove="window.status='法术【D】.htm'"><img src="icons/11.gif" class="p"> <span id="l116" class="unselected">法术【D】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/blank.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/10法术（Spells）/法术字母索引/法术E.htm" onclick="return LinkClick('117',false,true)" target="content" title="法术【E】.htm" onmousemove="window.status='法术【E】.htm'"><img src="icons/11.gif" class="p"> <span id="l117" class="unselected">法术【E】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/blank.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/10法术（Spells）/法术字母索引/法术F.htm" onclick="return LinkClick('118',false,true)" target="content" title="法术【F】.htm" onmousemove="window.status='法术【F】.htm'"><img src="icons/11.gif" class="p"> <span id="l118" class="unselected">法术【F】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/blank.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/10法术（Spells）/法术字母索引/法术G.htm" onclick="return LinkClick('119',false,true)" target="content" title="法术【G】.htm" onmousemove="window.status='法术【G】.htm'"><img src="icons/11.gif" class="p"> <span id="l119" class="unselected">法术【G】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/blank.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/10法术（Spells）/法术字母索引/法术H.htm" onclick="return LinkClick('120',false,true)" target="content" title="法术【H】.htm" onmousemove="window.status='法术【H】.htm'"><img src="icons/11.gif" class="p"> <span id="l120" class="unselected">法术【H】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/blank.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/10法术（Spells）/法术字母索引/法术I.htm" onclick="return LinkClick('121',false,true)" target="content" title="法术【I】.htm" onmousemove="window.status='法术【I】.htm'"><img src="icons/11.gif" class="p"> <span id="l121" class="unselected">法术【I】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/blank.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/10法术（Spells）/法术字母索引/法术J.htm" onclick="return LinkClick('122',false,true)" target="content" title="法术【J】.htm" onmousemove="window.status='法术【J】.htm'"><img src="icons/11.gif" class="p"> <span id="l122" class="unselected">法术【J】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/blank.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/10法术（Spells）/法术字母索引/法术K.htm" onclick="return LinkClick('123',false,true)" target="content" title="法术【K】.htm" onmousemove="window.status='法术【K】.htm'"><img src="icons/11.gif" class="p"> <span id="l123" class="unselected">法术【K】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/blank.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/10法术（Spells）/法术字母索引/法术L.htm" onclick="return LinkClick('124',false,true)" target="content" title="法术【L】.htm" onmousemove="window.status='法术【L】.htm'"><img src="icons/11.gif" class="p"> <span id="l124" class="unselected">法术【L】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/blank.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/10法术（Spells）/法术字母索引/法术M.htm" onclick="return LinkClick('125',false,true)" target="content" title="法术【M】.htm" onmousemove="window.status='法术【M】.htm'"><img src="icons/11.gif" class="p"> <span id="l125" class="unselected">法术【M】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/blank.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/10法术（Spells）/法术字母索引/法术N.htm" onclick="return LinkClick('126',false,true)" target="content" title="法术【N】.htm" onmousemove="window.status='法术【N】.htm'"><img src="icons/11.gif" class="p"> <span id="l126" class="unselected">法术【N】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/blank.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/10法术（Spells）/法术字母索引/法术O.htm" onclick="return LinkClick('127',false,true)" target="content" title="法术【O】.htm" onmousemove="window.status='法术【O】.htm'"><img src="icons/11.gif" class="p"> <span id="l127" class="unselected">法术【O】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/blank.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/10法术（Spells）/法术字母索引/法术P.htm" onclick="return LinkClick('128',false,true)" target="content" title="法术【P】.htm" onmousemove="window.status='法术【P】.htm'"><img src="icons/11.gif" class="p"> <span id="l128" class="unselected">法术【P】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/blank.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/10法术（Spells）/法术字母索引/法术Q.htm" onclick="return LinkClick('129',false,true)" target="content" title="法术【Q】.htm" onmousemove="window.status='法术【Q】.htm'"><img src="icons/11.gif" class="p"> <span id="l129" class="unselected">法术【Q】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/blank.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/10法术（Spells）/法术字母索引/法术R.htm" onclick="return LinkClick('130',false,true)" target="content" title="法术【R】.htm" onmousemove="window.status='法术【R】.htm'"><img src="icons/11.gif" class="p"> <span id="l130" class="unselected">法术【R】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/blank.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/10法术（Spells）/法术字母索引/法术S.htm" onclick="return LinkClick('131',false,true)" target="content" title="法术【S】.htm" onmousemove="window.status='法术【S】.htm'"><img src="icons/11.gif" class="p"> <span id="l131" class="unselected">法术【S】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/blank.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/10法术（Spells）/法术字母索引/法术T.htm" onclick="return LinkClick('132',false,true)" target="content" title="法术【T】.htm" onmousemove="window.status='法术【T】.htm'"><img src="icons/11.gif" class="p"> <span id="l132" class="unselected">法术【T】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/blank.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/10法术（Spells）/法术字母索引/法术U.htm" onclick="return LinkClick('133',false,true)" target="content" title="法术【U】.htm" onmousemove="window.status='法术【U】.htm'"><img src="icons/11.gif" class="p"> <span id="l133" class="unselected">法术【U】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/blank.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/10法术（Spells）/法术字母索引/法术V.htm" onclick="return LinkClick('134',false,true)" target="content" title="法术【V】.htm" onmousemove="window.status='法术【V】.htm'"><img src="icons/11.gif" class="p"> <span id="l134" class="unselected">法术【V】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/blank.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/10法术（Spells）/法术字母索引/法术W.htm" onclick="return LinkClick('135',false,true)" target="content" title="法术【W】.htm" onmousemove="window.status='法术【W】.htm'"><img src="icons/11.gif" class="p"> <span id="l135" class="unselected">法术【W】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/blank.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/10法术（Spells）/法术字母索引/法术Z.htm" onclick="return LinkClick('136',false,true)" target="content" title="法术【Z】.htm" onmousemove="window.status='法术【Z】.htm'"><img src="icons/11.gif" class="p"> <span id="l136" class="unselected">法术【Z】.htm</span></a></nobr></div>
+</div></div><div><nobr><a href="#" onClick="return NodeClick('137')"><img id="imgn137" src="icons/tplus.gif" class="p"></a><a href="topics/11怪物（Monsters）/怪物图鉴1（Monster Manual）.htm" onclick="return LinkClick('137',true,true)" onDblClick="return LinkDblClick('137')" target="content" title="11怪物（Monsters）.htm" onmousemove="window.status='11怪物（Monsters）.htm'"><img id="img137" src="icons/1.gif" class="p"> <span id="l137" class="unselected">11怪物（Monsters）.htm</span></a></nobr></div>
+<div id="d137" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/11怪物（Monsters）/怪物种类（Monster Type）.htm" onclick="return LinkClick('138',false,true)" target="content" title="怪物种类（Monster Type）.htm" onmousemove="window.status='怪物种类（Monster Type）.htm'"><img src="icons/11.gif" class="p"> <span id="l138" class="unselected">怪物种类（Monster Type）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><a href="#" onClick="return NodeClick('139')"><img id="imgn139" src="icons/tplus.gif" class="p"></a><a href="topics/11怪物（Monsters）/怪物【A】.htm" onclick="return LinkClick('139',true,true)" onDblClick="return LinkDblClick('139')" target="content" title="怪物【A】.htm" onmousemove="window.status='怪物【A】.htm'"><img id="img139" src="icons/1.gif" class="p"> <span id="l139" class="unselected">怪物【A】.htm</span></a></nobr></div>
+<div id="d139" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/11怪物（Monsters）/动物 (Animals).htm" onclick="return LinkClick('140',false,true)" target="content" title="动物 (Animals).htm" onmousemove="window.status='动物 (Animals).htm'"><img src="icons/11.gif" class="p"> <span id="l140" class="unselected">动物 (Animals).htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/11怪物（Monsters）/凶暴动物（Dire Animal）.htm" onclick="return LinkClick('141',false,true)" target="content" title="凶暴动物（Dire Animal）.htm" onmousemove="window.status='凶暴动物（Dire Animal）.htm'"><img src="icons/11.gif" class="p"> <span id="l141" class="unselected">凶暴动物（Dire Animal）.htm</span></a></nobr></div>
+</div><div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/11怪物（Monsters）/怪物【B】.htm" onclick="return LinkClick('142',false,true)" target="content" title="怪物【B】.htm" onmousemove="window.status='怪物【B】.htm'"><img src="icons/11.gif" class="p"> <span id="l142" class="unselected">怪物【B】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/11怪物（Monsters）/怪物【C】.htm" onclick="return LinkClick('143',false,true)" target="content" title="怪物【C】.htm" onmousemove="window.status='怪物【C】.htm'"><img src="icons/11.gif" class="p"> <span id="l143" class="unselected">怪物【C】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><a href="#" onClick="return NodeClick('144')"><img id="imgn144" src="icons/tplus.gif" class="p"></a><a href="topics/11怪物（Monsters）/怪物【D】.htm" onclick="return LinkClick('144',true,true)" onDblClick="return LinkDblClick('144')" target="content" title="怪物【D】.htm" onmousemove="window.status='怪物【D】.htm'"><img id="img144" src="icons/1.gif" class="p"> <span id="l144" class="unselected">怪物【D】.htm</span></a></nobr></div>
+<div id="d144" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/11怪物（Monsters）/恶魔（Demon）.htm" onclick="return LinkClick('145',false,true)" target="content" title="恶魔（Demon）.htm" onmousemove="window.status='恶魔（Demon）.htm'"><img src="icons/11.gif" class="p"> <span id="l145" class="unselected">恶魔（Demon）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/11怪物（Monsters）/魔鬼（Devil）.htm" onclick="return LinkClick('146',false,true)" target="content" title="魔鬼（Devil）.htm" onmousemove="window.status='魔鬼（Devil）.htm'"><img src="icons/11.gif" class="p"> <span id="l146" class="unselected">魔鬼（Devil）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/11怪物（Monsters）/恐龙（Dinosaur）.htm" onclick="return LinkClick('147',false,true)" target="content" title="恐龙（Dinosaur）.htm" onmousemove="window.status='恐龙（Dinosaur）.htm'"><img src="icons/11.gif" class="p"> <span id="l147" class="unselected">恐龙（Dinosaur）.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/11怪物（Monsters）/龙（Dragon）.htm" onclick="return LinkClick('148',false,true)" target="content" title="龙（Dragon）.htm" onmousemove="window.status='龙（Dragon）.htm'"><img src="icons/11.gif" class="p"> <span id="l148" class="unselected">龙（Dragon）.htm</span></a></nobr></div>
+</div><div><nobr><img src="icons/line.gif" class="p"><a href="#" onClick="return NodeClick('149')"><img id="imgn149" src="icons/tplus.gif" class="p"></a><a href="topics/11怪物（Monsters）/怪物【E】.htm" onclick="return LinkClick('149',true,true)" onDblClick="return LinkDblClick('149')" target="content" title="怪物【E】.htm" onmousemove="window.status='怪物【E】.htm'"><img id="img149" src="icons/1.gif" class="p"> <span id="l149" class="unselected">怪物【E】.htm</span></a></nobr></div>
+<div id="d149" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/11怪物（Monsters）/元素 (Elemental).htm" onclick="return LinkClick('150',false,true)" target="content" title="元素 (Elemental).htm" onmousemove="window.status='元素 (Elemental).htm'"><img src="icons/11.gif" class="p"> <span id="l150" class="unselected">元素 (Elemental).htm</span></a></nobr></div>
+</div><div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/11怪物（Monsters）/怪物【F】.htm" onclick="return LinkClick('151',false,true)" target="content" title="怪物【F】.htm" onmousemove="window.status='怪物【F】.htm'"><img src="icons/11.gif" class="p"> <span id="l151" class="unselected">怪物【F】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/11怪物（Monsters）/怪物【G】.htm" onclick="return LinkClick('152',false,true)" target="content" title="怪物【G】.htm" onmousemove="window.status='怪物【G】.htm'"><img src="icons/11.gif" class="p"> <span id="l152" class="unselected">怪物【G】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/11怪物（Monsters）/怪物【H】.htm" onclick="return LinkClick('153',false,true)" target="content" title="怪物【H】.htm" onmousemove="window.status='怪物【H】.htm'"><img src="icons/11.gif" class="p"> <span id="l153" class="unselected">怪物【H】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/11怪物（Monsters）/怪物【I】.htm" onclick="return LinkClick('154',false,true)" target="content" title="怪物【I】.htm" onmousemove="window.status='怪物【I】.htm'"><img src="icons/11.gif" class="p"> <span id="l154" class="unselected">怪物【I】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/11怪物（Monsters）/怪物【K】.htm" onclick="return LinkClick('155',false,true)" target="content" title="怪物【K】.htm" onmousemove="window.status='怪物【K】.htm'"><img src="icons/11.gif" class="p"> <span id="l155" class="unselected">怪物【K】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/11怪物（Monsters）/怪物【L】.htm" onclick="return LinkClick('156',false,true)" target="content" title="怪物【L】.htm" onmousemove="window.status='怪物【L】.htm'"><img src="icons/11.gif" class="p"> <span id="l156" class="unselected">怪物【L】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/11怪物（Monsters）/怪物【M】.htm" onclick="return LinkClick('157',false,true)" target="content" title="怪物【M】.htm" onmousemove="window.status='怪物【M】.htm'"><img src="icons/11.gif" class="p"> <span id="l157" class="unselected">怪物【M】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/11怪物（Monsters）/怪物【N】.htm" onclick="return LinkClick('158',false,true)" target="content" title="怪物【N】.htm" onmousemove="window.status='怪物【N】.htm'"><img src="icons/11.gif" class="p"> <span id="l158" class="unselected">怪物【N】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/11怪物（Monsters）/怪物【O】.htm" onclick="return LinkClick('159',false,true)" target="content" title="怪物【O】.htm" onmousemove="window.status='怪物【O】.htm'"><img src="icons/11.gif" class="p"> <span id="l159" class="unselected">怪物【O】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/11怪物（Monsters）/怪物【P】.htm" onclick="return LinkClick('160',false,true)" target="content" title="怪物【P】.htm" onmousemove="window.status='怪物【P】.htm'"><img src="icons/11.gif" class="p"> <span id="l160" class="unselected">怪物【P】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/11怪物（Monsters）/怪物【R】.htm" onclick="return LinkClick('161',false,true)" target="content" title="怪物【R】.htm" onmousemove="window.status='怪物【R】.htm'"><img src="icons/11.gif" class="p"> <span id="l161" class="unselected">怪物【R】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/11怪物（Monsters）/怪物【S】.htm" onclick="return LinkClick('162',false,true)" target="content" title="怪物【S】.htm" onmousemove="window.status='怪物【S】.htm'"><img src="icons/11.gif" class="p"> <span id="l162" class="unselected">怪物【S】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/11怪物（Monsters）/怪物【T】.htm" onclick="return LinkClick('163',false,true)" target="content" title="怪物【T】.htm" onmousemove="window.status='怪物【T】.htm'"><img src="icons/11.gif" class="p"> <span id="l163" class="unselected">怪物【T】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/11怪物（Monsters）/怪物【U】.htm" onclick="return LinkClick('164',false,true)" target="content" title="怪物【U】.htm" onmousemove="window.status='怪物【U】.htm'"><img src="icons/11.gif" class="p"> <span id="l164" class="unselected">怪物【U】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><a href="#" onClick="return NodeClick('165')"><img id="imgn165" src="icons/tplus.gif" class="p"></a><a href="topics/11怪物（Monsters）/怪物【V】.htm" onclick="return LinkClick('165',true,true)" onDblClick="return LinkDblClick('165')" target="content" title="怪物【V】.htm" onmousemove="window.status='怪物【V】.htm'"><img id="img165" src="icons/1.gif" class="p"> <span id="l165" class="unselected">怪物【V】.htm</span></a></nobr></div>
+<div id="d165" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/11怪物（Monsters）/虫类（Vermin）.htm" onclick="return LinkClick('166',false,true)" target="content" title="虫类（Vermin）.htm" onmousemove="window.status='虫类（Vermin）.htm'"><img src="icons/11.gif" class="p"> <span id="l166" class="unselected">虫类（Vermin）.htm</span></a></nobr></div>
+</div><div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/11怪物（Monsters）/怪物【W】.htm" onclick="return LinkClick('167',false,true)" target="content" title="怪物【W】.htm" onmousemove="window.status='怪物【W】.htm'"><img src="icons/11.gif" class="p"> <span id="l167" class="unselected">怪物【W】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/11怪物（Monsters）/怪物【X】.htm" onclick="return LinkClick('168',false,true)" target="content" title="怪物【X】.htm" onmousemove="window.status='怪物【X】.htm'"><img src="icons/11.gif" class="p"> <span id="l168" class="unselected">怪物【X】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/11怪物（Monsters）/怪物【Y】.htm" onclick="return LinkClick('169',false,true)" target="content" title="怪物【Y】.htm" onmousemove="window.status='怪物【Y】.htm'"><img src="icons/11.gif" class="p"> <span id="l169" class="unselected">怪物【Y】.htm</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/11怪物（Monsters）/怪物【Z】.htm" onclick="return LinkClick('170',false,true)" target="content" title="怪物【Z】.htm" onmousemove="window.status='怪物【Z】.htm'"><img src="icons/11.gif" class="p"> <span id="l170" class="unselected">怪物【Z】.htm</span></a></nobr></div>
+</div><div><nobr><a href="#" onClick="return NodeClick('171')"><img id="imgn171" src="icons/tplus.gif" class="p"></a><a href="#" onclick="return LinkClick('171',true,false)" onDblClick="return LinkDblClick('171')" target="content" title="12规则变化（Rule Changed）" onmousemove="window.status='12规则变化（Rule Changed）'"><img id="img171" src="icons/1.gif" class="p"> <span id="l171" class="unselected">12规则变化（Rule Changed）</span></a></nobr></div>
+<div id="d171" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/12规则变化（Rule Changed）/12规则变化（Rule Changed）.htm" onclick="return LinkClick('172',false,true)" target="content" title="规则变化（Rule Changed）" onmousemove="window.status='规则变化（Rule Changed）'"><img src="icons/11.gif" class="p"> <span id="l172" class="unselected">规则变化（Rule Changed）</span></a></nobr></div>
+</div><div><nobr><img src="icons/upangle.gif" class="p"><a href="topics/前言.htm" onclick="return LinkClick('173',false,true)" target="content" title="关于本文件.htm" onmousemove="window.status='关于本文件.htm'"><img src="icons/11.gif" class="p"> <span id="l173" class="unselected">关于本文件.htm</span></a></nobr></div>
+<script>divlist = [0,5,13,14,26,42,48,55,58,63,71,81,86,90,93,97,100,102,105,112,137,139,144,149,165,171]</script>
+</body>
+</html>
